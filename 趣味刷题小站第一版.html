@@ -330,13 +330,6 @@
 </head>
 <body class="font-sans p-3 md:p-8">
   <main class="min-h-screen flex flex-col items-center justify-center gap-5">
-    <header class="text-center">
-      <h1 class="text-3xl md:text-5xl font-black text-black tracking-tighter" style="text-shadow: 4px 4px 0 #FFCC00;">趣味刷题小站</h1>
-      <p class="mt-3 text-black font-black border-2 border-black inline-block px-4 py-1 bg-paper-white shadow-brutal-sm rotate-1">
-        题库闭环版 · 质量审核固定题库 · 自动硬盘备份
-      </p>
-    </header>
-
     <section class="iphone-frame">
       <div class="dynamic-island"></div>
       <div class="status-bar">
@@ -2370,6 +2363,7 @@ ${JSON.stringify(toFix.map(item => ({
       let lastDiskSaveError = null;
       let diskPersistenceAvailable = false;
       let diskErrorWasShown = false;
+      let localStateCacheDisabled = false;
       let serverStateVersion = '';
 
       function normalizePersistentState(candidate) {
@@ -2450,10 +2444,13 @@ ${JSON.stringify(toFix.map(item => ({
       }
 
       function cacheStateLocally() {
+        if (localStateCacheDisabled) return false;
         try {
           localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
           return true;
         } catch (error) {
+          localStateCacheDisabled = true;
+          try { localStorage.removeItem(STORAGE_KEY); } catch { /* 浏览器可能完全禁用本地存储 */ }
           console.warn('浏览器本地缓存不可用，继续使用服务器保存：', error);
           return false;
         }
@@ -2688,9 +2685,8 @@ ${JSON.stringify(toFix.map(item => ({
           // 零题记录只是一次失败的生成尝试，不是课程，任何情况下都不允许落库。
           pruneEmptyCourses();
           if (window.TEACHING_V1?.beforeQuizStateSave) window.TEACHING_V1.beforeQuizStateSave(state);
-          const cached = cacheStateLocally();
+          cacheStateLocally();
           scheduleDiskSave();
-          if (!cached) showToast('浏览器缓存不可用，数据仍会保存到服务器');
         } catch (error) {
           console.error(error);
           showToast('数据保存准备失败，请刷新后重试');
