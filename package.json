@@ -1,0 +1,14 @@
+{
+  "name": "zsshuati",
+  "version": "1.3.18",
+  "private": true,
+  "description": "趣味刷题小站：师生教学闭环与 AI 分步引导",
+  "scripts": {
+    "start": "node local-server.js",
+    "supervise": "node server-supervisor.js",
+    "check": "node --check local-server.js && node --check server-supervisor.js && node --check background-generation-engine.js && node --check background-generation-jobs.js && node --check teaching-closure-v11.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

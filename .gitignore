@@ -1,0 +1,24 @@
+# 本机密钥与账号配置
+*.local.json
+*.local.txt
+server-config.local.json
+ai-guide-secrets.local.json
+auth-secret.local.json
+智谱Key_只在本机填写.local.txt
+
+# 真实题库、学生学情、错题及运行记录
+题库数据备份/
+错题本数据/
+运行日志/
+*.jsonl
+.quiz-site-supervisor-*.json
+
+# 常见本地文件
+node_modules/
+.env
+.env.*
+!.env.example
+.DS_Store
+Thumbs.db
+*.log
+*.tmp

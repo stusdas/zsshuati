@@ -1,0 +1,3 @@
+# 复制本文件并改名为：智谱Key_只在本机填写.local.txt
+# 下一行只填写智谱 API Key；该 .local.txt 文件已被 Git 忽略。
+请在服务器本机填写智谱APIKey
