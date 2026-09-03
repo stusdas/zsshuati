@@ -13,6 +13,7 @@ const UPSTREAM_URL = 'https://api.siliconflow.cn/v1/chat/completions';
 const MAX_REQUEST_BYTES = 8 * 1024 * 1024;
 const DATA_DIRECTORY = process.env.QUIZ_DATA_DIRECTORY || path.join(ROOT, '题库数据备份');
 const STATE_FILE = path.join(DATA_DIRECTORY, '当前题库与学习记录.json');
+const PUBLIC_SEED_FILE = path.join(ROOT, 'initial-public-state.json');
 const BACKUP_DIRECTORY = path.join(DATA_DIRECTORY, '自动备份');
 const RUNTIME_LOG_DIRECTORY = process.env.QUIZ_RUNTIME_LOG_DIRECTORY || path.join(ROOT, '运行日志');
 const GENERATION_TIMING_FILE = path.join(RUNTIME_LOG_DIRECTORY, '题目生成步骤耗时记录_跨策略对比.jsonl');
@@ -729,6 +730,16 @@ function ensureServerTeachingState(state) {
 
 function readStatePayload() {
   if (!fs.existsSync(STATE_FILE)) {
+    if (fs.existsSync(PUBLIC_SEED_FILE)) {
+      const seeded = JSON.parse(fs.readFileSync(PUBLIC_SEED_FILE, 'utf8'));
+      if (!isValidStatePayload(seeded)) throw new Error('PUBLIC_SEED_FILE_INVALID');
+      seeded.state.current_session = null;
+      seeded.state.wrong_book = seeded.state.wrong_book && typeof seeded.state.wrong_book === 'object'
+        ? seeded.state.wrong_book
+        : {};
+      ensureServerTeachingState(seeded.state);
+      return seeded;
+    }
     const state = { courses: [], current_session: null, wrong_book: {}, teaching: {} };
     ensureServerTeachingState(state);
     return { format: 'quiz-site-quality-v2', saved_at: '', state };
